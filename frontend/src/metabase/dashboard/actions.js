@@ -1003,7 +1003,7 @@ export const navigateToNewCardFromDashboard = createThunkAction(
           metadata,
           dashboard.parameters,
           parameterValues,
-          dashcard && dashcard.parameter_mappings,
+          dashcard,
         );
 
     open(url, {
