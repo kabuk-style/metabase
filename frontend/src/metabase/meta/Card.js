@@ -201,9 +201,10 @@ export function questionUrlWithParameters(
       parameterValues,
     );
 
-    return question
-      .setParameterValues(parameterValuesByTemplateTag)
-      .setParameterValues(parameterValuesByTemplateTag)
-      .getUrlWithParameters();
+    return _.isEmpty(parameterValuesByTemplateTag)
+      ? question.getUrl()
+      : question
+          .setParameterValues(parameterValuesByTemplateTag)
+          .getUrlWithParameters();
   }
 }
