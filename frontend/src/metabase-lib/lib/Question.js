@@ -35,7 +35,10 @@ import {
   syncTableColumnsToQuery,
 } from "metabase/lib/dataset";
 import { isTransientId } from "metabase/meta/Card";
-import { getValueAndFieldIdPopulatedParametersFromCard } from "metabase/parameters/utils/cards";
+import {
+  getValueAndFieldIdPopulatedParametersFromCard,
+  remapParameterValuesToTemplateTags,
+} from "metabase/parameters/utils/cards";
 import { parameterToMBQLFilter } from "metabase/parameters/utils/mbql";
 import {
   normalizeParameterValue,
@@ -969,7 +972,7 @@ export default class Question {
 
     const canUseCardApiEndpoint = !isDirty && this.isSaved();
 
-    const parameters = this.parametersList()
+    const parameters = this.parameters()
       // include only parameters that have a value applied
       .filter(param => _.has(param, "value"))
       // only the superset of parameters object that API expects
@@ -1058,23 +1061,6 @@ export default class Question {
     return this.setCard(assoc(this.card(), "parameters", parameters));
   }
 
-  setParameterValues(parameterValues) {
-    const question = this.clone();
-    question._parameterValues = parameterValues;
-    return question;
-  }
-
-  setParameterValuesBySlug(parameterValuesBySlug) {
-    const parameters = this.parameters();
-    const parameterValues = getParameterValuesByIdFromSlugs(
-      parameters,
-      parameterValuesBySlug,
-    );
-    const question = this.clone();
-    question._parameterValues = parameterValues;
-    return question;
-  }
-
   // TODO: Fix incorrect Flow signature
   parameters(): ParameterObject[] {
     return getValueAndFieldIdPopulatedParametersFromCard(
@@ -1082,10 +1068,6 @@ export default class Question {
       this.metadata(),
       this._parameterValues,
     );
-  }
-
-  parametersList(): ParameterObject[] {
-    return (Object.values(this.parameters()): ParameterObject[]);
   }
 
   // predicate function that dermines if the question is "dirty" compared to the given question
@@ -1172,34 +1154,33 @@ export default class Question {
     return isAltered ? question.markDirty() : question;
   }
 
-  getUrlWithParameters() {
-    // when a question is structured & editable we convert the parameters on the card into filters
-    // and then ignore/throw away whatever parameter info exists on the card
-    if (this.isStructured() && this.query().isEditable()) {
-      const question = this.convertParametersToFilters();
+  getUrlWithParameters(parameters, parameterValues) {
+    const includeDisplayIsLocked = true;
 
-      delete question._parameterValues;
-      delete this._parameterValues;
-
-      return question.getUrl({
-        originalQuestion: this,
-        includeDisplayIsLocked: true,
+    if (this.isStructured()) {
+      const questionWithParameters = this.setParameters(parameters);
+      if (this.query().isEditable()) {
+        return questionWithParameters.convertParametersToFilters().getUrl({
+          originalQuestion: this,
+          includeDisplayIsLocked,
+        });
+      } else {
+        const query = getParameterValuesBySlug(parameters, parameterValues);
+        return questionWithParameters.markDirty().getUrl({
+          query,
+          includeDisplayIsLocked,
+        });
+      }
+    } else {
+      return this.getUrl({
+        query: remapParameterValuesToTemplateTags(
+          this.query().templateTags(),
+          parameters,
+          parameterValues,
+        ),
+        includeDisplayIsLocked,
       });
     }
-
-    const parameterValues = getParameterValuesBySlug(
-      this.parameters(),
-      this._parameterValues,
-    );
-
-    // when a question is structured & NOT editable, we send the card to the QB with parameters attached.
-    // we mark the card as dirty so that the serialized card + parameters are preserved in the url.
-    // native questions rely on the `parameterValues` being a map of template tags to values.
-    const question = this.isStructured() ? this.markDirty() : this;
-    return question.getUrl({
-      query: parameterValues,
-      includeDisplayIsLocked: true,
-    });
   }
 
   getModerationReviews() {
