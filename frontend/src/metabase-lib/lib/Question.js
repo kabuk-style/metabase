@@ -1154,7 +1154,10 @@ export default class Question {
       [this.query(), false],
     );
 
-    const question = query.question().setParameters([]);
+    const question = query
+      .question()
+      .setParameters(undefined)
+      .setParameterValues(undefined);
 
     return isAltered ? question.markDirty() : question;
   }
