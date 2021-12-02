@@ -210,6 +210,7 @@ export function getQuestionSteps(
         stageQuery,
         stageIndex,
         openSteps,
+        question,
       );
       // append actions to last step of previous stage
       if (allSteps.length > 0) {
@@ -235,6 +236,7 @@ export function getStageSteps(
   stageQuery: StructuredQuery,
   stageIndex: number,
   openSteps: OpenSteps,
+  question,
 ): { steps: Step[], actions: StepAction[] } {
   const getId = (step, itemIndex) =>
     `${stageIndex}:${step.type}` + (itemIndex > 0 ? `:${itemIndex}` : ``);
@@ -277,6 +279,7 @@ export function getStageSteps(
       previewQuery: null,
       next: null,
       previous: null,
+      question,
     };
     return step;
   }

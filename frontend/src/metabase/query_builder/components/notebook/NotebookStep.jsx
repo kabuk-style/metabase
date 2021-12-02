@@ -111,6 +111,7 @@ export default class NotebookStep extends React.Component {
       isLastStep,
       isLastOpened,
       updateQuery,
+      updateQuestion,
     } = this.props;
     const { showPreview } = this.state;
 
@@ -182,6 +183,7 @@ export default class NotebookStep extends React.Component {
                   step={step}
                   query={step.query}
                   updateQuery={updateQuery}
+                  updateQuestion={updateQuestion}
                   isLastOpened={isLastOpened}
                 />
               </Box>

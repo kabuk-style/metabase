@@ -38,7 +38,7 @@ export default class NotebookSteps extends React.Component {
   };
 
   render() {
-    const { question, className } = this.props;
+    const { question, className, updateQuestion } = this.props;
     const { openSteps, lastOpenedStep } = this.state;
 
     if (!question) {
@@ -60,6 +60,7 @@ export default class NotebookSteps extends React.Component {
             <NotebookStep
               key={step.id}
               step={step}
+              updateQuestion={updateQuestion}
               updateQuery={updateQuery}
               openStep={this.openStep}
               closeStep={this.closeStep}

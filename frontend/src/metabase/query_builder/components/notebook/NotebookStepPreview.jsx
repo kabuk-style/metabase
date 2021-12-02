@@ -32,10 +32,15 @@ class NotebookStepPreview extends React.Component {
 
   getPreviewQuestion(step) {
     const query = step.previewQuery;
+    const settings = step.question.settings();
+
     return Question.create()
       .setQuery(query.limit() < 10 ? query : query.updateLimit(10))
       .setDisplay("table")
-      .setSettings({ "table.pivot": false });
+      .setSettings({
+        "table.pivot": false,
+        "table.columns": settings["table.columns"],
+      });
   }
 
   getIsDirty() {
