@@ -1,4 +1,8 @@
-import { getParameterTargetField } from "./targets";
+import {
+  isDimensionTarget,
+  getTemplateTagFromTarget,
+  getParameterTargetField,
+} from "./targets";
 import {
   metadata,
   PRODUCTS,
@@ -6,6 +10,33 @@ import {
 } from "__support__/sample_dataset_fixture";
 
 describe("parameters/utils/targets", () => {
+  describe("isDimensionTarget", () => {
+    it('should return true for a target that contanis a "dimension" string in the first entry', () => {
+      expect(isDimensionTarget(["foo"])).toBe(false);
+      expect(isDimensionTarget()).toBe(false);
+      expect(isDimensionTarget(["dimension"])).toBe(true);
+    });
+  });
+
+  describe("getTemplateTagFromTarget", () => {
+    it("should return the tag of a template tag target", () => {
+      expect(
+        getTemplateTagFromTarget(["variable", ["template-tag", "foo"]]),
+      ).toBe("foo");
+      expect(
+        getTemplateTagFromTarget(["dimension", ["template-tag", "bar"]]),
+      ).toBe("bar");
+    });
+
+    it("should return null for targets that are not template tags", () => {
+      expect(getTemplateTagFromTarget(["foo"])).toBe(null);
+      expect(getTemplateTagFromTarget()).toBe(null);
+      expect(
+        getTemplateTagFromTarget(["dimension", ["field", 123, null]]),
+      ).toBe(null);
+    });
+  });
+
   describe("getParameterTargetField", () => {
     it("should return null when the target is not a dimension", () => {
       expect(getParameterTargetField(["variable", "foo"], metadata)).toBe(null);
