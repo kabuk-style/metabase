@@ -19,6 +19,7 @@ import {
   XValue,
 } from "metabase/static-viz/components/XYChart/types";
 import { getX } from "metabase/static-viz/components/XYChart/utils/series";
+import { max } from "d3";
 
 export const getRotatedXTickHeight = (tickWidth: number) => {
   return Math.ceil(Math.sqrt(Math.pow(tickWidth, 2) / 2));
@@ -116,12 +117,11 @@ export const calculateYTickWidth = (
   settings: ChartSettings["y"]["format"],
   fontSize: number,
 ) => {
-  return getYTickWidth(
-    domain,
-    { y: (value: number) => value },
-    settings,
-    fontSize,
-  ) as number;
+  const domainValuesWidths = domain
+    .map(value => formatNumber(value, settings))
+    .map(formatted => measureText(formatted, fontSize));
+
+  return max(domainValuesWidths);
 };
 
 export const getYTickWidths = (
