@@ -1,5 +1,5 @@
 import { TickRendererProps } from "@visx/axis";
-import { getYTickWidth } from "metabase/static-viz/lib/axes";
+import { max } from "d3-array";
 import { formatDate, DateFormatOptions } from "metabase/static-viz/lib/dates";
 import {
   formatNumber,
@@ -19,7 +19,6 @@ import {
   XValue,
 } from "metabase/static-viz/components/XYChart/types";
 import { getX } from "metabase/static-viz/components/XYChart/utils/series";
-import { max } from "d3";
 
 export const getRotatedXTickHeight = (tickWidth: number) => {
   return Math.ceil(Math.sqrt(Math.pow(tickWidth, 2) / 2));
