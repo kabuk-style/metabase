@@ -20,7 +20,8 @@
            com.google.api.client.http.HttpRequestInitializer
            [com.google.api.services.bigquery Bigquery Bigquery$Builder BigqueryScopes]
            [com.google.api.services.bigquery.model GetQueryResultsResponse QueryRequest QueryResponse Table TableCell TableFieldSchema TableList TableList$Tables TableReference TableRow TableSchema]
-           java.util.Collections))
+           java.util.Collections
+           (java.util HashSet)))
 
 (driver/register! :bigquery, :parent #{:google :sql})
 
@@ -41,7 +42,7 @@
             (.setApplicationName google/application-name))))
 
 (def ^:private ^{:arglists '([database])} ^GoogleCredential database->credential
-  (partial google/database->credential (Collections/singleton BigqueryScopes/BIGQUERY)))
+  (partial google/database->credential (HashSet. #{BigqueryScopes/BIGQUERY, "https://www.googleapis.com/auth/drive"})))
 
 (def ^:private ^{:arglists '([database])} ^Bigquery database->client
   (comp credential->client database->credential))
