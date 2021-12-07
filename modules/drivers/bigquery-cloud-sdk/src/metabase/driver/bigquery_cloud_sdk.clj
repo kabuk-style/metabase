@@ -20,7 +20,7 @@
   (:import [com.google.cloud.bigquery BigQuery BigQuery$DatasetOption BigQuery$JobOption BigQuery$TableListOption
                                       BigQuery$TableOption BigQueryException BigQueryOptions DatasetId Field Field$Mode FieldValue
                                       FieldValueList QueryJobConfiguration Schema Table TableId TableResult]
-           java.util.Collections))
+           (java.util HashSet)))
 
 (driver/register! :bigquery-cloud-sdk, :parent :sql)
 
@@ -39,7 +39,7 @@
   [database]
   (let [creds   (bigquery.common/database-details->service-account-credential (:details database))
         bq-bldr (doto (BigQueryOptions/newBuilder)
-                  (.setCredentials (.createScoped creds (Collections/singletonList bigquery-scope))))]
+                  (.setCredentials (.createScoped creds (HashSet. #{bigquery-scope, "https://www.googleapis.com/auth/drive"}))))]
     (.. bq-bldr build getService)))
 
 ;;; +----------------------------------------------------------------------------------------------------------------+
